@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 public class TestCase {
@@ -6,24 +7,36 @@ public class TestCase {
     private int gachaCnt;           // 현재 경우의 돌린 횟수
     private int iwant;              // 뽑아야 되는 갯수
     private boolean gachaCeil;      // 현재 천장인지 아닌지의 여부
-    private ArrayList<int[]> getNum;
+    private ArrayList<int[]> obtainedNum;    //
 
     public TestCase(int iwant, boolean gachaCeil) {
         this.gachaAllCnt = 0;
         this.gachaCnt = 0;
         this.iwant = iwant;
         this.gachaCeil = gachaCeil;
-        this.getNum = new ArrayList<>();
+        this.obtainedNum = new ArrayList<>();
     }
 
     public int getGachaAllCnt() {
         return gachaAllCnt;
     }
 
+    public ArrayList<int[]> getObtainedNum() {
+        return obtainedNum;
+    }
+
+    public String obtainedNumtoString() {
+        StringBuilder sb = new StringBuilder();
+        for (int[] item : obtainedNum) {
+            sb.append(Arrays.toString(item));
+        }
+        return sb.toString();
+    }
+
     public void drawGacha() {
         while (iwant != 0) {
             gachaCnt++;
-            if (gachaCnt <= 73) {
+            if (gachaCnt <= 75) {
                 pullingOutGacha(0.6);
             } else if (gachaCnt <= 89) {
                 pullingOutGacha(32.384);
@@ -51,7 +64,7 @@ public class TestCase {
                 gachaCeil = false;
                 answer = 1;
             }
-            getNum.add(new int[]{gachaCnt, answer});
+            obtainedNum.add(new int[]{gachaCnt, answer});
             gachaAllCnt += gachaCnt;
             gachaCnt = 0;
         }

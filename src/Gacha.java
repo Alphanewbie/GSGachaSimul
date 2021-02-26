@@ -1,4 +1,7 @@
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.PriorityQueue;
 
 /*
 생각해보면 iwant가 3이 될 때까지 해야 하는데....
@@ -14,6 +17,7 @@ public class Gacha {
     private int iwant;      // 뽑아야 되는 갯수
     private boolean gachaCeil;      // 현재 천장인지 아닌지의 여부
     private int gachaSum = 0;    // 총 가챠 횟수
+    private int maxGachaCnt;
     private ArrayList<TestCase> testList;
 
     public Gacha(int testCase, int iwant, boolean gachaCeil) {
@@ -22,20 +26,85 @@ public class Gacha {
         this.gachaCeil = gachaCeil;
         this.gachaSum = 0;
         this.testList = new ArrayList<>();
+        this.maxGachaCnt = 0;
     }
 
-    public String run() {
+    public void run() {
         TestCase currCase;
         for (int i = 0; i < testCase; i++) {
             currCase = new TestCase(iwant, gachaCeil);
             currCase.drawGacha();
             testList.add(currCase);
             gachaSum += currCase.getGachaAllCnt();
+            maxGachaCnt = Math.max(maxGachaCnt, currCase.getGachaAllCnt());
         }
+    }
 
+    public String summary() {
         StringBuilder sb = new StringBuilder();
         sb.append("예상 연차수 : ");
         sb.append((double) gachaSum / testCase);
         return sb.toString();
     }
+
+    public String detail() {
+        StringBuilder sb = new StringBuilder();
+        for (TestCase item : testList) {
+            sb.append(item.obtainedNumtoString());
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
+    // 각각 분포도를 알려준다.
+    public String distribution() {
+        int[] dist = new int[maxGachaCnt + 1];
+        for (TestCase item : testList) {
+            dist[item.getGachaAllCnt()]++;
+        }
+        PriorityQueue<int[]> priorityQueue = new PriorityQueue<>(new Comparator<int[]>() {
+            @Override
+            public int compare(int[] o1, int[] o2) {
+                return o2[1] - o1[1];
+            }
+        });
+        StringBuilder sb = new StringBuilder();
+        int[] queIn;
+        for (int i = 1; i <= maxGachaCnt/10; i++) {
+            queIn = new int[] {i*10,0};
+            for(int j=queIn[0]-9;j<=queIn[0];j++) {
+                if(j>maxGachaCnt)
+                    break;
+                queIn[1] += dist[j];
+            }
+            priorityQueue.add(queIn);
+        }
+        int[] output;
+        while (!priorityQueue.isEmpty()) {
+            output = priorityQueue.poll();
+            sb.append(String.format("%3d연 : %d회\n", output[0], output[1]));
+        }
+        return sb.toString();
+    }
+
+    // 각각 분포도를 알려준다.
+    public String gachaList() {
+        int[] dist = new int[maxGachaCnt + 1];
+        for (TestCase item : testList) {
+            dist[item.getGachaAllCnt()]++;
+        }
+        StringBuilder sb = new StringBuilder();
+        int[] output;
+        for (int i = 1; i <= maxGachaCnt/10; i++) {
+            output = new int[] {i*10,0};
+            for(int j=output[0]-9;j<=output[0];j++) {
+                if(j>maxGachaCnt)
+                    break;
+                output[1] += dist[j];
+            }
+            sb.append(String.format("%3d연 : %d회\n", output[0], output[1]));
+        }
+        return sb.toString();
+    }
 }
+
